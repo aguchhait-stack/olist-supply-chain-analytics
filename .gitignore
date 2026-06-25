@@ -1,2 +1,4 @@
 *.db
-data/olist_geolocation_dataset.csv
+*.txt
+.DS_Store
+.vscode/extensions.json
