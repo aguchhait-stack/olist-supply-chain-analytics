@@ -21,3 +21,5 @@ A data-driven logistics optimization engine built with the Brazilian E-Commerce 
         | |                 | |
         | |                 | |
 ```
+## 📚 Data Citation
+Olist, and André Sionek. (2018). Brazilian E-Commerce Public Dataset by Olist [Dataset]. Kaggle. https://doi.org/10.34740/KAGGLE/DSV/195341
