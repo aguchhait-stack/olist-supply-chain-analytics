@@ -25,6 +25,7 @@ def ingestion(path=path):
         print("✅ Pipeline completed successfully")
     except Exception as e:
         print(f"❌ Error: {e}") 
+    return engine
         
 if __name__ == '__main__':
     ingestion()

@@ -1,5 +1,22 @@
+# Databases and raw data tracks
 *.db
-*.txt
-*.DS_Store
-*.vscode/extensions.json
 *.csv
+data/
+
+# OS-specific files
+*.DS_Store
+Thumbs.db
+
+# Project logs, documentation notes, and guidelines
+*.txt
+
+# Local IDE configuration/Extensions
+.vscode/
+.idea/
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
