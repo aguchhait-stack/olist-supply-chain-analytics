@@ -8,5 +8,5 @@ def plot_top_revenue_categories(data):
     plt.grid(alpha=0.3,axis='x')
     plt.xlabel("Revenue (£)")
     plt.tight_layout()
-    plt.savefig('outputs.png')
+    plt.savefig('outputs/Top_Product_Categories.png')
     plt.show()
