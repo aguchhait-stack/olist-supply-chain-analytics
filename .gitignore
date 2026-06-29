@@ -19,4 +19,11 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.pytest_cache/
+.pytest_cache/.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+src/.ipynb_checkpoints/
+outputs/.ipynb_checkpoints/
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+src/.ipynb_checkpoints/
+outputs/.ipynb_checkpoints/

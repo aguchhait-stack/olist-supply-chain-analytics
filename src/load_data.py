@@ -30,7 +30,7 @@ def load_joined_data(engine) -> pd.DataFrame:
         op.payment_type,
 
         -- PRODUCTS & TRANSLATION
-        COALESCE(t.product_category_name_english, p.product_category_name,'unknown') AS product_category,
+        p.product_id, COALESCE(t.product_category_name_english, p.product_category_name,'unknown') AS product_category,
 
         -- SELLERS
         s.seller_zip_code_prefix, s.seller_city, s.seller_state,

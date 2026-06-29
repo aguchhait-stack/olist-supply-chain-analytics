@@ -14,7 +14,7 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 
 ## 📊 EDA
 
-![RFM Segments](outputs/segment_relative_importance_heatmap.png)
+![RFM Segments](outputs/customer_segment.png)
 
 ---
 
