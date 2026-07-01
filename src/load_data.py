@@ -40,7 +40,7 @@ def load_joined_data(engine) -> pd.DataFrame:
 
     From Customers c
     INNER JOIN Orders o USING(customer_id)
-    INNER JOIN Order_items oi USING(order_id)
+    LEFT JOIN Order_items oi USING(order_id)
     LEFT JOIN products p USING(product_id)
     LEFT JOIN Product_category_name_translation t USING(product_category_name)
     LEFT JOIN Sellers s  USING(seller_id)
@@ -48,6 +48,9 @@ def load_joined_data(engine) -> pd.DataFrame:
     LEFT JOIN Order_reviews r USING(order_id)
     """
     joined_df = pd.read_sql(query,engine)
+    date_col = ['order_purchase_timestamp','order_delivered_carrier_date','order_delivered_customer_date','order_estimated_delivery_date']
+    for col in date_col:
+        joined_df[col] = pd.to_datetime(joined_df[col],errors='coerce')
     return joined_df
 
 if __name__ == "__main__":

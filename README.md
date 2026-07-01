@@ -16,6 +16,10 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 
 ![RFM Segments](outputs/customer_segment.png)
 
+![SLA Breach Rate](outputs/sla_breach_by_state.png)
+
+![Delivery time](outputs/interstate_vs_deliverydays.png)
+
 ---
 
 ## ⚠️ Project Status: Under Construction
