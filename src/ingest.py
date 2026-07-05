@@ -9,25 +9,7 @@ db_path = os.path.join(DATA_DIR, 'ecommerce.db')
 engine = create_engine(f'sqlite:///{db_path}')
 
 def ingestion(path: str = DATA_DIR):
-    """
-    Download the Olist dataset from Kaggle and load CSV files into SQLite.
-
-    This function downloads the official Olist Brazilian e-commerce dataset
-    using `kagglehub`, creates a SQLite database, and loads each CSV file
-    into a separate SQL table. Table names are derived from the filenames by
-    removing the ``olist_`` prefix and ``_dataset`` suffix.
-
-    Args:
-        path (str, optional): Directory where the dataset and SQLite database
-            will be stored. Defaults to ``"data"``.
-
-    Returns:
-        Engine: SQLAlchemy engine connected to the SQLite database.
-
-    Raises:
-    Exception: If downloading the dataset or loading the CSV files into
-        the SQLite database fails.
-    """
+    
     try:
         dataset_path = kagglehub.dataset_download("olistbr/brazilian-ecommerce",output_dir=path,force_download=True)
         count = 0 
