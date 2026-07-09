@@ -6,9 +6,8 @@ data/
 # OS-specific files
 *.DS_Store
 Thumbs.db
-
+*project_guideline.txt
 # Project logs, documentation notes, and guidelines
-*.txt
 
 # Local IDE configuration/Extensions
 .vscode/
