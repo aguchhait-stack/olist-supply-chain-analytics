@@ -28,6 +28,7 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 
 ![SLA Breach Rate](outputs/sla_breach_by_state.png)
 
+![NLP Dashboard](outputs/nlp_dashboard.png)
 
 ---
 
