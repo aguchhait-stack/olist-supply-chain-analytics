@@ -11,20 +11,9 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 - **Dashboard Interface:** Streamlit
 
 ---
-
-## Data Architecture — Medallion Pattern
-- **Bronze:** Raw SQLite tables (9 tables, ingested via SQLAlchemy)
-- **Silver:** `master_df` — 8-table join, item-level grain, 
-  source of truth for all downstream analysis
-- **Gold:** Subject-area DataFrames derived from master_df
-  - `sales_df` — item-level, price nulls removed
-  - `logistics_df` — order-level, delivered orders only  
-
----
-
 ## 📊 EDA
 
-![RFM Segments](outputs/customer_segment.png)
+![RFM Scatter](outputs/rfm_scatter.png)
 
 ![SLA Breach Rate](outputs/sla_breach_by_state.png)
 
