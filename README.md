@@ -13,6 +13,9 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 ---
 ## 📊 EDA
 
+
+![Time-series Dashboard](outputs/monthly_performance_dashboard.png)
+
 ![RFM Scatter](outputs/rfm_scatter.png)
 
 ![SLA Breach Rate](outputs/sla_breach_by_state.png)
