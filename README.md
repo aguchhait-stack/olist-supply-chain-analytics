@@ -40,7 +40,7 @@ cd olist-supply-chain-analytics
 pip install -r requirements.txt
 
 # Run full pipeline (python3 for macOS/Linux, python for Windows)
-jupyter notebook notebook.ipynb
+jupyter notebook
 ```
 
 ---

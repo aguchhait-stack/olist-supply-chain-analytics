@@ -20,14 +20,12 @@ def ingestion(path: str = DATA_DIR):
                 file_df = pd.read_csv(file_path)
                 count += 1
                 file_df.to_sql(f'{file}',con=engine,if_exists='replace',index=False)
-        print(f"Files loading: {count}")
-        tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", engine)  
-        print(f"Tables loaded: {len(tables)}")    
+        print(f"Files loading: {count}")  
         print("✅ Pipeline completed successfully")
         return engine
     except Exception as e:
         print(f"❌ Error: {e}") 
         raise 
         
-if __name__ == '__main__':
+if __name__ == "__main__":
     ingestion()
