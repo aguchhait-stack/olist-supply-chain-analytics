@@ -15,6 +15,8 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 
 ![Time-series Dashboard](outputs/monthly_performance_dashboard.png)
 
+![Logistics Co-relation](outputs/logistics_correlation_matrix.png)
+
 ![SLA Breach Rate](outputs/sla_breach_by_state.png)
 
 ![NLP Dashboard](outputs/nlp_dashboard.png)
@@ -39,8 +41,10 @@ cd olist-supply-chain-analytics
 # Install dependencies
 pip install -r requirements.txt
 
-# Run full pipeline (python3 for macOS/Linux, python for Windows)
+
+# Run full pipeline 
 jupyter notebook
+
 ```
 
 ---
