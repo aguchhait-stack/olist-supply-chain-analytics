@@ -36,17 +36,15 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 ```bash
 git clone https://github.com/aguchhait-stack/olist-supply-chain-analytics.git
 cd olist-supply-chain-analytics
+
+# Wordcloud removed for Windows (install in notebook)
 pip install -r requirements.txt
 
-# If WordCloud fails:
-pip install --upgrade pip setuptools wheel
-pip install wordcloud --use-pep517
+# Run only if a PyTorch error
+# pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-#If PyTorch fails:
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-
-# Run full pipeline 
-jupyter notebook notebooks/notebook.ipynb
+# Run full pipeline
+jupyter notebook notebook.ipynb
 ```
 ---
 
