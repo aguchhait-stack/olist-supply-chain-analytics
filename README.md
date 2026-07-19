@@ -34,19 +34,20 @@ End-to-end supply chain analytics project using Olist's Brazilian e-commerce dat
 **Prerequisites:** Python 3.8+
 
 ```bash
-# Clone repository
 git clone https://github.com/aguchhait-stack/olist-supply-chain-analytics.git
 cd olist-supply-chain-analytics
-
-# Install dependencies
 pip install -r requirements.txt
 
+# If WordCloud fails:
+pip install --upgrade pip setuptools wheel
+pip install wordcloud --use-pep517
+
+#If PyTorch fails:
+pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 # Run full pipeline 
-jupyter notebook
-
+jupyter notebook notebooks/notebook.ipynb
 ```
-
 ---
 
 ## 📚 Data Citation
