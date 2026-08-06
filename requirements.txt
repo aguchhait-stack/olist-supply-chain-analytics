@@ -10,5 +10,7 @@ kagglehub>=0.2.0
 nltk>=3.8.0
 sqlalchemy>=2.0.0
 transformers>=4.35.0
+pytest>=7.0.0
+pytest-cov>=4.0.0 
 torch>=2.0.0; sys_platform == "win32"
 wordcloud; sys_platform == "darwin" or sys_platform == "linux"
