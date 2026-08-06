@@ -13,6 +13,11 @@ def test_ingestion():
     engine = ingestion()
     assert engine is not None
 
+def test_ingestion_failure():
+    with pytest.raises(Exception):
+        ingestion(path="/invalid/path")
+
+
 @pytest.mark.skipif(not os.path.exists('data/ecommerce.db'),reason = 'Run ingestion() first.')
 def test_tables(engine):
     tables = pd.read_sql("SELECT name FROM sqlite_master where type = 'table'",engine)

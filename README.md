@@ -90,7 +90,25 @@ pip install -r requirements.txt
 
 # Launch notebook
 jupyter notebook notebook.ipynb
+
+# Run all tests
+pytest tests/ -v
 ```
+---
+
+## 📁 Project Structure
+
+```
+olist-supply-chain-analytics/
+├── data/               # SQLite database
+├── outputs/            # Plots and visualizations
+├── src/                # Source code
+├── tests/              # Unit tests
+├── dashboard.twb       # Tableau workbook
+├── notebook.ipynb      # Main analysis
+└── requirements.txt    # Dependencies
+```
+
 ---
 
 ## 📚 Data Citation
