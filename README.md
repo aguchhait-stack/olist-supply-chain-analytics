@@ -82,6 +82,10 @@
 # Clone repository
 git clone https://github.com/aguchhait-stack/olist-supply-chain-analytics.git
 cd olist-supply-chain-analytics
+
+# Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
  
 # Install dependencies
 pip install -r requirements.txt
@@ -89,6 +93,12 @@ pip install -r requirements.txt
 # Windows (if required)
 # pip install torch --index-url https://download.pytorch.org/whl/cpu
 # pip install wordcloud --prefer-binary
+
+# Register the Jupyter kernel
+python -m ipykernel install --user --name=olist-venv --display-name "Python (olist-venv)"
+
+# Install the project itself in editable mode
+pip install -e .
 
 # Launch notebook
 jupyter notebook notebooks/01_olist_supply_chain_analysis.ipynb
