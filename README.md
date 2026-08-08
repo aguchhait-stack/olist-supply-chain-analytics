@@ -76,38 +76,31 @@
 
 ## 📥 Installation
 
-**Prerequisites:** Python 3.8+
+**Prerequisites:** Python 3.10+
 
 ```bash
+# Clone repository
 git clone https://github.com/aguchhait-stack/olist-supply-chain-analytics.git
 cd olist-supply-chain-analytics
-
+ 
+# Install dependencies
 pip install -r requirements.txt
 
-# Windows users: 
+# Windows (if required)
 # pip install torch --index-url https://download.pytorch.org/whl/cpu
 # pip install wordcloud --prefer-binary
 
 # Launch notebook
-jupyter notebook notebook.ipynb
+jupyter notebook notebooks/01_olist_supply_chain_analysis.ipynb
 
 # Run all tests
 pytest tests/ -v
 ```
 ---
 
-## 📁 Project Structure
+## 🚧 Current Development Status
 
-```
-olist-supply-chain-analytics/
-├── data/               # SQLite database
-├── outputs/            # Plots and visualizations
-├── src/                # Source code
-├── tests/              # Unit tests
-├── dashboard.twb       # Tableau workbook
-├── notebook.ipynb      # Main analysis
-└── requirements.txt    # Dependencies
-```
+The repository is currently being refactored from a research notebook into a production-grade Python package.
 
 ---
 
