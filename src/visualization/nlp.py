@@ -1,7 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from src.models.sentiment_model import (NUMERIC_FEATURE_COLS, SCALED_FEATURE_COLS)
+import seaborn as sns
+
 
 def plot_nlp_dashboard(nlp_df: pd.DataFrame, tfidf_vectorizer):
+    """
+    Plot an NLP dashboard comparing review, delivery, and customer metrics.
+    """
     late_freq, _, _ = tfidf_vectorizer(nlp_df[nlp_df["is_late"] ==1]["review_comment_message"])
     ontime_freq, _, _ = tfidf_vectorizer(nlp_df[nlp_df["is_late"] ==0]["review_comment_message"])
 
@@ -69,4 +75,77 @@ def plot_nlp_dashboard(nlp_df: pd.DataFrame, tfidf_vectorizer):
     plt.suptitle("NLP Analysis Dashboard", fontsize=13, fontweight='bold')
     plt.tight_layout()
     plt.savefig('../outputs/nlp_dashboard.png')
+    plt.show()
+
+
+
+def plot_predictive_word(model,vectorizer):
+    """
+    Visualize the most predictive words for each sentiment class.
+    """
+
+    # Feature Co-efficients
+    coef = model.named_steps['logistic'].coef_
+
+    # class labels
+    index = model.named_steps['logistic'].classes_
+
+    # ColumnTransformer changes the order, the passthrogh columns placed after the affected one
+    feature_names = SCALED_FEATURE_COLS +\
+                   [col for col in NUMERIC_FEATURE_COLS if col not in SCALED_FEATURE_COLS ] + \
+                    vectorizer.get_feature_names_out().tolist()
+
+    # Dataframe for Co-efficients
+    coef_df = pd.DataFrame(model.named_steps['logistic'].coef_,index = index, columns = feature_names).T
+
+    try: 
+        from wordcloud import WordCloud
+        # Word Clouds
+        fig, axis = plt.subplots(1,3, figsize= (18,6))
+        colormap = {'negative': 'Reds', 'neutral': 'Blues', 'positive': 'Greens'}
+        for i, (sentiment, color) in enumerate(colormap.items()):
+            wc = WordCloud(width=600, height=400,background_color='white',colormap= color)
+            
+            # only positive top 50 coefficients for this sentiment class
+            top_words = coef_df[sentiment][coef_df[sentiment] > 0].nlargest(50).to_dict()
+            axis[i].imshow(wc.generate_from_frequencies(top_words),interpolation='bilinear')
+            axis[i].set_title(f'{sentiment.capitalize()} Reviews', fontweight='bold')
+            axis[i].axis('off')  
+            
+        plt.suptitle('Most Predictive Words by Sentiment Class',fontsize=13,fontweight='bold')
+        plt.tight_layout()
+        plt.savefig('..outputs/predictive_words_wordcloud_colored.png')
+        plt.show()
+
+    except Exception as e:
+        print("WordCloud module missing or failed. Try running: pip install wordcloud")
+
+
+    #  Bar Charts
+    fig, axis = plt.subplots(1,3, figsize= (18,6))
+    colormap = {'negative': 'red', 'neutral': 'blue', 'positive': 'green'}
+    for i, (sentiment, color) in enumerate(colormap.items()):
+        # only positive top 10 coefficients for this sentiment class
+        top_words = coef_df[sentiment][coef_df[sentiment] > 0].nlargest(10)
+        axis[i].barh(top_words.index, top_words.values, color = color)
+        axis[i].grid(True, alpha=0.3, axis='x')
+        axis[i].set_title(f'{sentiment.capitalize()} Reviews', fontweight='bold')
+        
+    plt.suptitle('Top 10 Predictive Words by Sentiment Class',fontsize=13,fontweight='bold')
+    plt.tight_layout()
+    plt.savefig('../outputs/predictive_words_barchart.png')
+    plt.show()
+
+def plot_sentiment_correlation(nlp_df: pd.DataFrame):
+    """
+    Plot Spearman correlations between logistics drivers and sentiment metrics.
+    """
+    plt.figure(figsize=(12,8))
+    sns.heatmap(nlp_df[['carrier_transit_days',
+    'is_interstate','distance_km','is_late','mean_review_score','review_length',
+    'total_freight_value','total_price','vendor_handling_days','delivery_days']].corr(method='spearman'),cmap='coolwarm',
+    square=True,annot=True, vmin=-1, vmax=1, linewidths=0.5, fmt = ".2f")
+    plt.xticks(rotation=50)
+    plt.title('Spearman Correlation: Logistics Drivers vs Sentiment', fontsize=11, fontweight='bold')
+    plt.savefig('../outputs/spearman_correlation_drivers_vs_sentiment.png')
     plt.show()
