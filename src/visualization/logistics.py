@@ -21,7 +21,7 @@ def plot_sla_breach_by_state(logistics_df, contingency, chi2, p, dof):
     plt.grid(alpha=0.3,axis='x')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('../outputs/sla_breach_by_state.png')
+    plt.savefig('outputs/sla_breach_by_state.png')
     plt.show()
 
 def plot_logistics_correlation(logistics_df: pd.DataFrame):
@@ -34,7 +34,7 @@ def plot_logistics_correlation(logistics_df: pd.DataFrame):
     sns.heatmap(corrrelation_matrix,cmap='coolwarm',square=True,annot=True, vmin=-1, vmax=1, linewidths=0.5, fmt = ".2f")
     plt.title('Logistics Drivers: Spearman Correlation Matrix', fontsize=11, fontweight='bold')
     plt.xticks(rotation=20)
-    plt.savefig('../outputs/logistics_correlation_matrix.png')
+    plt.savefig('outputs/logistics_correlation_matrix.png')
     plt.show()
 
 def plot_logistics_bottlenecks(logistics_df: pd.DataFrame):
@@ -62,6 +62,6 @@ def plot_logistics_bottlenecks(logistics_df: pd.DataFrame):
     axis[1].legend(['Intrastate', 'Interstate'])
     axis[1].grid(True, alpha=0.3)
     plt.suptitle('Logistics Bottleneck Analysis', fontsize=11, fontweight='bold')
-    plt.savefig('../outputs/distance_vs_freight.png')
+    plt.savefig('outputs/distance_vs_freight.png')
     plt.tight_layout()
     plt.show()

@@ -12,7 +12,9 @@ def build_knowledge_base(
 
     The knowledge base contains:
     - Business KPIs
+    - Monthly business performance
     - Logistics metrics
+    - State-level SLA findings
     - Statistical findings
     - Logistics bottleneck findings
     - Freight and distance findings
@@ -32,7 +34,10 @@ def build_knowledge_base(
         .copy()
     )
 
+    # ------------------------------------------------------------
     # Monthly revenue
+    # ------------------------------------------------------------
+
     monthly_revenue = (
         visualization_df["total_price"]
         .resample("ME")
@@ -45,7 +50,10 @@ def build_knowledge_base(
             f"was R$ {revenue:,.2f}."
         )
 
+    # ------------------------------------------------------------
     # Monthly orders
+    # ------------------------------------------------------------
+
     monthly_orders = (
         visualization_df["order_id"]
         .resample("ME")
@@ -58,7 +66,10 @@ def build_knowledge_base(
             f"were {orders:,}."
         )
 
+    # ------------------------------------------------------------
     # Monthly freight
+    # ------------------------------------------------------------
+
     monthly_freight = (
         visualization_df["total_freight_value"]
         .resample("ME")
@@ -71,7 +82,82 @@ def build_knowledge_base(
             f"was R$ {freight:,.2f}."
         )
 
+    # ------------------------------------------------------------
+    # Monthly order changes
+    # ------------------------------------------------------------
+
+    monthly_order_change = (
+        monthly_orders
+        .pct_change()
+        .mul(100)
+    )
+
+    for date, change in monthly_order_change.items():
+
+        if pd.notna(change):
+
+            documents.append(
+                f"Monthly order volume changed by "
+                f"{change:.2f}% in {date.strftime('%B %Y')} "
+                f"compared with the previous month."
+            )
+
+    # ------------------------------------------------------------
+    # Monthly revenue changes
+    # ------------------------------------------------------------
+
+    monthly_revenue_change = (
+        monthly_revenue
+        .pct_change()
+        .mul(100)
+    )
+
+    for date, change in monthly_revenue_change.items():
+
+        if pd.notna(change):
+
+            documents.append(
+                f"Monthly revenue changed by "
+                f"{change:.2f}% in {date.strftime('%B %Y')} "
+                f"compared with the previous month."
+            )
+
+    # ------------------------------------------------------------
+    # October / November comparison
+    # ------------------------------------------------------------
+
+    october_orders = monthly_orders[
+        monthly_orders.index.month == 10
+    ]
+
+    november_orders = monthly_orders[
+        monthly_orders.index.month == 11
+    ]
+
+    if not october_orders.empty and not november_orders.empty:
+
+        october_total = october_orders.sum()
+        november_total = november_orders.sum()
+
+        if october_total != 0:
+
+            change = (
+                (november_total - october_total)
+                / october_total
+            ) * 100
+
+            documents.append(
+                f"November order volume was {change:.2f}% "
+                f"compared with October order volume in the "
+                f"available data. This describes a time-series "
+                f"pattern and does not establish that Black Friday "
+                f"caused the change."
+            )
+
+    # ------------------------------------------------------------
     # Top 5 product categories
+    # ------------------------------------------------------------
+
     top5_categories = (
         visualization_df
         .groupby("product_category")["total_price"]
@@ -80,6 +166,7 @@ def build_knowledge_base(
     )
 
     for category, revenue in top5_categories.items():
+
         documents.append(
             f"Product category {category} generated "
             f"R$ {revenue:,.2f} in total revenue."
@@ -139,6 +226,77 @@ def build_knowledge_base(
         f"states (chi-square = {chi2:.2f}, {p_text}, "
         f"dof = {dof})."
     )
+
+    # ============================================================
+    # STATE-LEVEL SLA ANALYSIS
+    # ============================================================
+
+    state_sla = (
+        logistics_df
+        .groupby("customer_state")["is_late"]
+        .agg(
+            late_rate="mean",
+            order_count="count"
+        )
+        .sort_values("late_rate")
+    )
+
+    # One document for every state
+    for state, row in state_sla.iterrows():
+
+        documents.append(
+            f"State {state} has an SLA breach rate of "
+            f"{row['late_rate']:.2%} based on "
+            f"{int(row['order_count']):,} orders."
+        )
+
+    # ------------------------------------------------------------
+    # Lowest SLA breach rate
+    # ------------------------------------------------------------
+
+    if not state_sla.empty:
+
+        lowest_state = state_sla["late_rate"].idxmin()
+
+        lowest_rate = state_sla.loc[
+            lowest_state,
+            "late_rate"
+        ]
+
+        lowest_count = state_sla.loc[
+            lowest_state,
+            "order_count"
+        ]
+
+        documents.append(
+            f"State {lowest_state} has the lowest observed "
+            f"SLA breach rate at {lowest_rate:.2%}, based on "
+            f"{int(lowest_count):,} orders."
+        )
+
+    # ------------------------------------------------------------
+    # Highest SLA breach rate
+    # ------------------------------------------------------------
+
+    if not state_sla.empty:
+
+        highest_state = state_sla["late_rate"].idxmax()
+
+        highest_rate = state_sla.loc[
+            highest_state,
+            "late_rate"
+        ]
+
+        highest_count = state_sla.loc[
+            highest_state,
+            "order_count"
+        ]
+
+        documents.append(
+            f"State {highest_state} has the highest observed "
+            f"SLA breach rate at {highest_rate:.2%}, based on "
+            f"{int(highest_count):,} orders."
+        )
 
     # ============================================================
     # Logistics bottleneck analysis
@@ -203,8 +361,8 @@ def build_knowledge_base(
         f"with late deliveries (Spearman correlation = "
         f"{carrier_correlation:.2f}) than vendor handling time "
         f"(Spearman correlation = {vendor_correlation:.2f}). "
-        f"This suggests that regional carrier optimization "
-        f"should be considered a key logistics priority."
+        f"This suggests that carrier transit time is an important "
+        f"factor to investigate."
     )
 
     # ============================================================
@@ -290,6 +448,7 @@ def build_knowledge_base(
     )
 
     for segment, customers in rfm_segments.items():
+
         documents.append(
             f"Customer segmentation: the {segment} segment "
             f"contains {customers:,} customers."
@@ -348,6 +507,7 @@ def build_knowledge_base(
     )
 
     for sentiment, percentage in sentiment_distribution.items():
+
         documents.append(
             f"{percentage:.2f}% of customer reviews are "
             f"classified as {sentiment}."

@@ -74,7 +74,7 @@ def plot_nlp_dashboard(nlp_df: pd.DataFrame, tfidf_vectorizer):
 
     plt.suptitle("NLP Analysis Dashboard", fontsize=13, fontweight='bold')
     plt.tight_layout()
-    plt.savefig('../outputs/nlp_dashboard.png')
+    plt.savefig('outputs/nlp_dashboard.png')
     plt.show()
 
 
@@ -133,7 +133,7 @@ def plot_predictive_word(model,vectorizer):
         
     plt.suptitle('Top 10 Predictive Words by Sentiment Class',fontsize=13,fontweight='bold')
     plt.tight_layout()
-    plt.savefig('../outputs/predictive_words_barchart.png')
+    plt.savefig('outputs/predictive_words_barchart.png')
     plt.show()
 
 def plot_sentiment_correlation(nlp_df: pd.DataFrame):
@@ -147,5 +147,5 @@ def plot_sentiment_correlation(nlp_df: pd.DataFrame):
     square=True,annot=True, vmin=-1, vmax=1, linewidths=0.5, fmt = ".2f")
     plt.xticks(rotation=50)
     plt.title('Spearman Correlation: Logistics Drivers vs Sentiment', fontsize=11, fontweight='bold')
-    plt.savefig('../outputs/spearman_correlation_drivers_vs_sentiment.png')
+    plt.savefig('outputs/spearman_correlation_drivers_vs_sentiment.png')
     plt.show()

@@ -17,5 +17,5 @@ def plot_rfm_segments(rfm: pd.DataFrame):
     plt.grid(alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig('../outputs/rfm_scatter.png')
+    plt.savefig('outputs/rfm_scatter.png')
     plt.show()

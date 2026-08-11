@@ -10,6 +10,7 @@ import nltk
 #nltk.download('stopwords')
 #nltk.download('punkt_tab')
 #nltk.download('rslp')
+from src.models.sentiment_model import label_sentiment
 
 def _build_nlp_dataframe(logistics_df: pd.DataFrame):
     """
@@ -70,5 +71,6 @@ def build_sentiment_analysis(logistics_df: pd.DataFrame):
         sparse TF-IDF matrix, and fitted vectorizer.
     """
     nlp_df = _build_nlp_dataframe(logistics_df)
+    nlp_df = label_sentiment(nlp_df)
     word_frequency_sorted, X_sparse, vectorizer = _tfidf_vectorizer(nlp_df['review_comment_message'])
     return nlp_df,word_frequency_sorted, X_sparse, vectorizer

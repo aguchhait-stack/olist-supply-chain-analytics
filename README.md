@@ -90,18 +90,17 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Windows (if required)
-# pip install torch --index-url https://download.pytorch.org/whl/cpu
-# pip install wordcloud --prefer-binary
-
-# Register the Jupyter kernel
-python -m ipykernel install --user --name=olist-venv --display-name "Python (olist-venv)"
-
-# Install the project itself in editable mode
+# Install the project in editable mode
 pip install -e .
 
+# Register the virtual environment as a Jupyter kernel
+python -m ipykernel install --user --name=olist-venv --display-name "Python (olist-venv)"
+
 # Launch notebook
-jupyter notebook notebooks/01_olist_supply_chain_analysis.ipynb
+jupyter notebook notebook.ipynb
+
+# Run the complete pipeline
+python main.py
 
 # Run all tests
 pytest tests/ -v

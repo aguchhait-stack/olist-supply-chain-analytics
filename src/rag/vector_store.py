@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def create_vector_store(
     documents,
     document_vectors
@@ -15,7 +14,7 @@ def create_vector_store(
     logger.info("Creating ChromaDB vector store")
 
     client = chromadb.PersistentClient(
-        path="data/chroma"
+        path="vectorstore/chroma"
     )
 
     collection = client.get_or_create_collection(

@@ -1,26 +1,32 @@
 # -----------------------------
-# Data
+# Raw Data
 # -----------------------------
-*.db
-*.csv
-data/
+
+/data/
 
 # -----------------------------
 # Python virtual environments
 # -----------------------------
+
 .venv/
 venv/
 env/
 
+# Environment variables
+
+.env
+.env.*
+
 # -----------------------------
 # Python cache
 # -----------------------------
+
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
-.coverage
-.coverage.*
+*.coverage
+*.coverage.*
 htmlcov/
 .mypy_cache/
 .ruff_cache/
@@ -28,21 +34,45 @@ htmlcov/
 # -----------------------------
 # Jupyter
 # -----------------------------
+
 .ipynb_checkpoints/
 
 # -----------------------------
 # IDE
 # -----------------------------
+
 .vscode/
 .idea/
 
 # -----------------------------
 # Operating System
 # -----------------------------
+
 .DS_Store
 Thumbs.db
 
 # -----------------------------
+# Streamlit
+# -----------------------------
+
+.streamlit/secrets.toml
+
+# -----------------------------
+# ChromaDB / Vector Store
+# -----------------------------
+
+/vectorstore/
+
+# -----------------------------
+# Hugging Face cache
+# -----------------------------
+
+.cache/
+huggingface/
+.huggingface/
+
+# -----------------------------
 # Project-specific
 # -----------------------------
+
 *project_guideline.txt
