@@ -1,5 +1,5 @@
 import pytest
-from src.ingest import ingestion
+from src.data.ingest import ingestion
 import pandas as pd
 
 
