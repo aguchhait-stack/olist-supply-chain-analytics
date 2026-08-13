@@ -3,6 +3,8 @@ from src.data.ingest import engine
 import pandas as pd
 import numpy as np
 
+logger = logging.getLogger(__name__)
+
 def _build_master_dataframe(engine) -> pd.DataFrame:
     """Create the transaction-level master dataframe."""
     MASTER_QUERY = """
@@ -45,6 +47,7 @@ def _build_master_dataframe(engine) -> pd.DataFrame:
     # Converting all datetime columns to pandas datetime64 dtype
     for col in master_df.columns[master_df.columns.str.contains("date|timestamp|approved_at")]:
             master_df[col] = pd.to_datetime(master_df[col],errors="coerce")
+    logger.info(f"Master dataframe: {master_df.shape[0]:,} rows, {master_df.shape[1]} columns")
     return master_df
 
 def _aggregate_orders(master_df: pd.DataFrame) -> pd.DataFrame:
@@ -171,5 +174,5 @@ def build_logistics_dataframe(engine=engine) -> pd.DataFrame:
     logistics_df = _add_order_features(logistics_df)
     logistics_df = _add_geolocation(logistics_df, engine)
     logistics_df = _add_haversine_distance(logistics_df)
-
+    logger.info(f"✅ Logistics dataframe: {logistics_df.shape[0]:,} rows, {logistics_df.shape[1]} columns")
     return logistics_df

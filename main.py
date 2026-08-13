@@ -1,11 +1,13 @@
+from src.utils.logging import setup_logging
 from src.data.ingest import engine,ingestion
 from src.data.builder import build_logistics_dataframe
 from src.analytics.rfm import build_customer_segmentation
 from src.nlp.sentiment import build_sentiment_analysis
-from src.pipeline.knowledge_base import build_knowledge_base
+from src.rag.knowledge_base import build_knowledge_base
 from src.rag.embeddings import create_embeddings
 from src.rag.vector_store import create_vector_store
 import pandas as pd
+setup_logging()
 
 def main():
     """
@@ -35,7 +37,7 @@ def main():
     print("NLP completed.")
 
     print("Starting knowledge base...")
-    documents = build_knowledge_base(logistics_df,rfm,nlp_df)
+    documents = build_knowledge_base(logistics_df,contingency,nlp_df)
     print(f"Knowledge base created with {len(documents)} documents.")
 
     print("Starting embeddings...")

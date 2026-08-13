@@ -9,6 +9,7 @@ DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 db_path = os.path.join(DATA_DIR, 'ecommerce.db')
 engine = create_engine(f'sqlite:///{db_path}')
+logger.info(f"Database path: {db_path}")
 
 def ingestion(path: str = DATA_DIR):
     
@@ -22,11 +23,11 @@ def ingestion(path: str = DATA_DIR):
                 file_df = pd.read_csv(file_path)
                 count += 1
                 file_df.to_sql(f'{file}',con=engine,if_exists='replace',index=False)
-        print(f"Files loading: {count}")  
+        logger.info(f"Files loading...: {count}")  
         logger.info("Pipeline completed")
         return engine
     except Exception as e:
-        print(f"❌ Error: {e}") 
+        print(f"Error: {e}") 
         raise 
         
 if __name__ == "__main__":
