@@ -6,11 +6,10 @@ from nltk.stem import RSLPStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 import logging
 import nltk 
-# Download once
-#nltk.download('punkt') 
-#nltk.download('stopwords')
-#nltk.download('punkt_tab')
-#nltk.download('rslp')
+nltk.download('punkt') 
+nltk.download('stopwords')
+nltk.download('punkt_tab')
+nltk.download('rslp')
 logger = logging.getLogger(__name__)
 
 def _build_nlp_dataframe(logistics_df: pd.DataFrame) -> pd.DataFrame:
