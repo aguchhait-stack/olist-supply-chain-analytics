@@ -8,36 +8,41 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 GEMINI_MODEL = "gemini-3.5-flash"
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
 
 def ask_assistant(question: str, collection, top_k: int = 2) -> str:
     """RAG pipeline — retrieve context and generate answer."""
-    
-    # 1. Retrieve
-    results = retrieve_knowledge(question, collection, top_k)
-    if not results:
-        logger.warning("No relevant documents found.")
-        return "I could not find relevant knowledge to answer this question."
-    
-    context = "\n\n".join(r["document"] for r in results)
-    
-    # 2. Prompt
-    prompt = f"""
-Answer the user's question using only the retrieved business knowledge below.
-Do not add unsupported information.
-Always respond in English.
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return "Please set up my API key." 
+        client = genai.Client(api_key=api_key)
 
-Retrieved knowledge:
-{context}
+        # 1. Retrieve
+        results = retrieve_knowledge(question, collection, top_k)
+        if not results:
+            logger.warning("No relevant documents found.")
+            return "I could not find relevant knowledge to answer this question."
+        
+        context = "\n\n".join(r["document"] for r in results)
+        
+        # 2. Prompt
+        prompt = f"""
+    Answer the user's question using only the retrieved business knowledge below.
+    Do not add unsupported information.
+    Always respond in English.
 
-Question:
-{question}
+    Retrieved knowledge:
+    {context}
 
-Answer:
-"""
-    
-    # 3. Generate
-    response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
-    logger.info("RAG pipeline completed.")
-    return response.text.strip()
+    Question:
+    {question}
+
+    Answer:
+    """
+        
+        # 3. Generate
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
+        logger.info("RAG pipeline completed.")
+        return response.text.strip()
+    except Exception as e:
+        logger.error(f"RAG pipeline failed: {e}")
