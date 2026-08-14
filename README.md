@@ -99,7 +99,10 @@ python -m ipykernel install --user --name=olist-venv --display-name "Python (oli
 # Launch notebook
 jupyter notebook notebook.ipynb
 
-# Run the complete pipeline
+# Launch the Streamlit dashboard
+streamlit run app.py
+
+# Run the complete pipeline from the command line
 python main.py
 
 # Run all tests

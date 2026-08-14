@@ -1,15 +1,24 @@
 import pandas as pd
 from transformers import pipeline
 from sklearn.metrics import classification_report
+import warnings
 import logging
+import os
+
 logger = logging.getLogger(__name__)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
+
+#Supress warning
+warnings.filterwarnings('ignore')
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+logging.getLogger("httpx").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+logging.getLogger("transformers").setLevel(logging.ERROR)
 HF_MODEL_NAME = 'cardiffnlp/xlm-roberta-base-tweet-sentiment-pt'
 SAMPLE_SIZE = 500
 RANDOM_STATE = 42
 
-def compare_with_huggingface_baseline(nlp_df: pd.DataFrame, sample_size: int = SAMPLE_SIZE) -> dict:
+def compare_with_huggingface_baseline(nlp_df: pd.DataFrame, sample_size: int = SAMPLE_SIZE) -> tuple:
 
     pipe = pipeline(task="sentiment-analysis",model = HF_MODEL_NAME,truncation=True)
 

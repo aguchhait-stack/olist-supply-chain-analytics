@@ -2,10 +2,11 @@
 from src.data.ingest import engine
 import pandas as pd
 import numpy as np
+import logging
 
 logger = logging.getLogger(__name__)
 
-def _build_master_dataframe(engine) -> pd.DataFrame:
+def build_master_dataframe(engine) -> pd.DataFrame:
     """Create the transaction-level master dataframe."""
     MASTER_QUERY = """
 
@@ -47,7 +48,7 @@ def _build_master_dataframe(engine) -> pd.DataFrame:
     # Converting all datetime columns to pandas datetime64 dtype
     for col in master_df.columns[master_df.columns.str.contains("date|timestamp|approved_at")]:
             master_df[col] = pd.to_datetime(master_df[col],errors="coerce")
-    logger.info(f"Master dataframe: {master_df.shape[0]:,} rows, {master_df.shape[1]} columns")
+    logger.info(f"✅ Master dataframe: {master_df.shape[0]:,} rows, {master_df.shape[1]} columns")
     return master_df
 
 def _aggregate_orders(master_df: pd.DataFrame) -> pd.DataFrame:
@@ -147,7 +148,7 @@ def _add_haversine_distance(logistics_df: pd.DataFrame) -> pd.DataFrame:
     logistics_df['distance_km'] = logistics_df['distance_km'].fillna(logistics_df['distance_km'].median())
     return logistics_df
 
-def build_logistics_dataframe(engine=engine) -> pd.DataFrame:
+def build_logistics_dataframe(engine=engine, master_df=None) -> pd.DataFrame:
     """
     Build the canonical logistics dataset.
 
@@ -167,7 +168,9 @@ def build_logistics_dataframe(engine=engine) -> pd.DataFrame:
         One row per delivered order with engineered logistics features.
     """
 
-    master_df =    _build_master_dataframe(engine)
+    if master_df is None:
+        master_df = build_master_dataframe(engine)
+    logger.info("Logistics dataframe creating...")
     logistics_df = _aggregate_orders(master_df)
     logistics_df = _add_order_level_flags(logistics_df)
     logistics_df = _deduplicate_orders(logistics_df)

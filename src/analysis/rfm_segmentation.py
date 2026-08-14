@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+import logging
 logger = logging.getLogger(__name__)
 RANDOM_STATE = 42
 
@@ -90,7 +91,7 @@ def build_customer_segmentation(logistics_df: pd.DataFrame, n_clusters: int = 4)
     rfm = _build_rfm_table(logistics_df)
     rfm, X_train_scaled, X_test_scaled,kmeans  = _fit_kmeans(rfm,n_clusters=n_clusters)
     logistics_df = _merge_customer_segments(logistics_df, rfm)
-    logger.info(f"✅ Segmentation complete: {len(rfm):,} customers segmented")
+    logger.info("Segmentation complete: %d segments created",rfm["KMeans_Segment_name"].nunique())
     return logistics_df, rfm, X_train_scaled, X_test_scaled, kmeans 
 
 

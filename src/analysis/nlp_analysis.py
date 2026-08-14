@@ -4,25 +4,37 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import RSLPStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
+import logging
 import nltk 
 # Download once
 #nltk.download('punkt') 
 #nltk.download('stopwords')
 #nltk.download('punkt_tab')
 #nltk.download('rslp')
-from src.models.sentiment_model import label_sentiment
-
 logger = logging.getLogger(__name__)
 
-def _build_nlp_dataframe(logistics_df: pd.DataFrame):
+def _build_nlp_dataframe(logistics_df: pd.DataFrame) -> pd.DataFrame:
     """
     Create the NLP dataframe from customer review comments.
     """
     nlp_df = logistics_df[logistics_df["review_comment_message"].notna()].copy()
     nlp_df['review_length'] = nlp_df["review_comment_message"].str.len()
+    logger.info(f"✅ NLP dataframe: {nlp_df.shape[0]:,} reviews")
     return nlp_df
 
-def _tfidf_vectorizer(column: pd.Series):
+def _label_sentiment(nlp_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Map review scores to positive, neutral, or negative sentiment labels.
+    """
+    nlp_df = nlp_df.copy()
+    nlp_df['sentiment'] = nlp_df['mean_review_score'].astype(int).map(lambda x: 'positive' if x>=4  
+                                                                            else 'neutral' if  x ==3  
+                                                                            else 'negative')
+    logger.info(f"Avg score: {nlp_df['mean_review_score'].mean():.2f}")
+    return nlp_df
+
+
+def tfidf_vectorizer(column: pd.Series) -> tuple:
     """
     Process Portuguese review text using TF-IDF.
 
@@ -54,10 +66,10 @@ def _tfidf_vectorizer(column: pd.Series):
     # TF-IDF Words Frequency
     word_frequency = dict(zip(feature_name,X_sparse.toarray().sum(axis=0)))
     word_frequency_sorted = dict(sorted(word_frequency.items(), key = lambda x: x[1], reverse=True))
-    
+    logger.info(f"✅ TF-IDF complete: {len(feature_name):,} features")
     return word_frequency_sorted, X_sparse, vectorizer
 
-def build_sentiment_analysis(logistics_df: pd.DataFrame):
+def build_sentiment_analysis(logistics_df: pd.DataFrame) -> tuple:
     """
     Build the NLP dataset and TF-IDF representation.
 
@@ -73,7 +85,6 @@ def build_sentiment_analysis(logistics_df: pd.DataFrame):
         sparse TF-IDF matrix, and fitted vectorizer.
     """
     nlp_df = _build_nlp_dataframe(logistics_df)
-    nlp_df = label_sentiment(nlp_df)
-    word_frequency_sorted, X_sparse, vectorizer = _tfidf_vectorizer(nlp_df['review_comment_message'])
-    logger.info(f"✅ Sentiment analysis complete: {nlp_df.shape[0]:,} reviews")
+    nlp_df = _label_sentiment(nlp_df)
+    word_frequency_sorted, X_sparse, vectorizer = tfidf_vectorizer(nlp_df['review_comment_message'])
     return nlp_df,word_frequency_sorted, X_sparse, vectorizer

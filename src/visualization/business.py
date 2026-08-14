@@ -51,4 +51,4 @@ def plot_monthly_performance_dashboard(logistics_df: pd.DataFrame):
     for a in ax.flatten():
         a.set_xlabel('')
     plt.savefig('outputs/monthly_performance_dashboard.png')
-    plt.show()
+    return fig

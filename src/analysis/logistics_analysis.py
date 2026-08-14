@@ -20,3 +20,4 @@ def analyze_sla_by_state(logistics_df: pd.DataFrame) -> tuple:
         logger.info("SLA breach rate is uniform across all Brazilian states")
 
     return contingency, chi2, p, dof, expected
+

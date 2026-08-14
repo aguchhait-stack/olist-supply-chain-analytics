@@ -5,13 +5,18 @@ import kagglehub
 import logging
 logger = logging.getLogger(__name__)
 
-DATA_DIR = "data"
-os.makedirs(DATA_DIR, exist_ok=True)
-db_path = os.path.join(DATA_DIR, 'ecommerce.db')
+# Making directory for both raw and find db
+RAW_DATA_DIR = "data/raw"
+os.makedirs(RAW_DATA_DIR, exist_ok=True)
+PROCESSED_DATA_DIR = "data/processed"
+os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
+
+# SQL Engine
+db_path = os.path.join(PROCESSED_DATA_DIR, 'ecommerce.db')
 engine = create_engine(f'sqlite:///{db_path}')
 logger.info(f"Database path: {db_path}")
 
-def ingestion(path: str = DATA_DIR):
+def ingestion(path: str = RAW_DATA_DIR):
     
     try:
         dataset_path = kagglehub.dataset_download("olistbr/brazilian-ecommerce",output_dir=path,force_download=True)

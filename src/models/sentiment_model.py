@@ -5,20 +5,13 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+import logging
 
+logger = logging.getLogger(__name__)
 RANDOM_STATE = 42
 NUMERIC_FEATURE_COLS = ["is_late", "review_length", "delivery_days"]
 SCALED_FEATURE_COLS = ["review_length", "delivery_days"]
-
-def label_sentiment(nlp_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Map review scores to positive, neutral, or negative sentiment labels.
-    """
-    nlp_df = nlp_df.copy()
-    nlp_df['sentiment'] = nlp_df['mean_review_score'].astype(int).map(lambda x: 'positive' if x>=4  
-                                                                            else 'neutral' if  x ==3  
-                                                                            else 'negative')
-    return nlp_df
 
 def _build_feature_matrix(nlp_df: pd.DataFrame, X_sparse: csr_matrix) -> tuple:
     """
@@ -55,11 +48,10 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
     Returns
     -------
     tuple
-        Trained Logistic Regression pipeline, predicted labels,
-        and test-set labels.
+        Trained model pipeline, test feature matrix, predicted labels,
+        and actual test labels.
     """
 
-    nlp_df = label_sentiment(nlp_df)
     features, target = _build_feature_matrix(nlp_df,X_sparse)
 
     # train test split, stratify for biasness proof
@@ -83,6 +75,10 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
                                                         ))])
     pipeline_logit.fit(X_train,y_train)
     y_pred = pipeline_logit.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    logger.info(f"✅ Model trained, Test Accuracy: {accuracy:.4f}")
+    logger.info(f"\n{classification_report(y_test, y_pred)}")
+
     return pipeline_logit, X_test, y_pred, y_test
 
 
