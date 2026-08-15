@@ -53,55 +53,71 @@ with tab1:
     st.pyplot(fig)
 
 with st.sidebar:
-    st.subheader("Ask the Olist Assistant")
-    
-    # Sample Questions as Buttons
-    st.caption("Try asking:")
-    
-    if st.button("What is the late delivery rate?", use_container_width=True):
-        prompt = "What is the late delivery rate?"
-    
-    if st.button("Show top 5 products by revenue", use_container_width=True):
-        prompt = "Show top 5 products by revenue"
-    
-    if st.button("Which state has the worst SLA?", use_container_width=True):
-        prompt = "Which state has the worst SLA breach rate?"
-    
-    if st.button("How is customer sentiment overall?", use_container_width=True):
-        prompt = "How is customer sentiment overall?"
-    
-    if st.button("What are the customer segments?", use_container_width=True):
-        prompt = "What are the customer segments and their characteristics?"
-    
-    if st.button("What is the average delivery time?", use_container_width=True):
-        prompt = "What is the average delivery time in days?"
-    
-    st.divider()
-    
-    # Chat history
+    st.subheader("🤖 Ask the Olist Assistant")
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    
-    for msg in st.session_state.messages[-10:]:
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
-    
+
+    # Sample Questions
+    st.caption("Try asking:")
+
+    sample_questions = [
+        "What is the late delivery rate?",
+        "Show top 5 products by revenue",
+        "Which state has the worst SLA breach rate?",
+        "How is customer sentiment overall?",
+        "What are the customer segments and their characteristics?",
+        "What is the average delivery time in days?"
+    ]
+
+    selected_prompt = None
+
+    for sample_question in sample_questions:
+        if st.button(sample_question, use_container_width=True):
+            selected_prompt = sample_question
+
+    st.divider()
+
+    # Chat history
+    for message in st.session_state.messages[-10:]:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
     # Chat input
-    if prompt := st.chat_input("Ask me anything..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
+    typed_prompt = st.chat_input("Ask me anything...")
+
+    if typed_prompt:
+        selected_prompt = typed_prompt
+
+    # Process question
+    if selected_prompt:
+
         with st.chat_message("user"):
-            st.write(prompt)
-        
+            st.markdown(selected_prompt)
+
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    answer = ask_assistant(prompt, collection)
-                except Exception as e:
-                    answer = f"Error: {str(e)}"
-            st.write(answer)
-        
-        st.session_state.messages.append({"role": "assistant", "content": answer})
-        st.rerun()
+                    answer = ask_assistant(
+                        selected_prompt,
+                        collection
+                    )
+                except Exception:
+                    logger.exception("RAG assistant failed")
+                    answer = "Sorry, I couldn't process that question."
+
+            st.markdown(answer)
+
+        # Save conversation
+        st.session_state.messages.append({
+            "role": "user",
+            "content": selected_prompt
+        })
+
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer
+        })
 with tab2:
     st.header("Sentiment Analysis")
     fig1 = plot_nlp_dashboard(nlp_df, tfidf_vectorizer)
