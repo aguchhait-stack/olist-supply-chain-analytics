@@ -52,39 +52,56 @@ with tab1:
     fig = plot_monthly_performance_dashboard(period_df)
     st.pyplot(fig)
 
-
 with st.sidebar:
-    st.subheader("🤖 Ask the Olist Assistant")
-
+    st.subheader("Ask the Olist Assistant")
+    
+    # Sample Questions as Buttons
+    st.caption("Try asking:")
+    
+    if st.button("What is the late delivery rate?", use_container_width=True):
+        prompt = "What is the late delivery rate?"
+    
+    if st.button("Show top 5 products by revenue", use_container_width=True):
+        prompt = "Show top 5 products by revenue"
+    
+    if st.button("Which state has the worst SLA?", use_container_width=True):
+        prompt = "Which state has the worst SLA breach rate?"
+    
+    if st.button("How is customer sentiment overall?", use_container_width=True):
+        prompt = "How is customer sentiment overall?"
+    
+    if st.button("What are the customer segments?", use_container_width=True):
+        prompt = "What are the customer segments and their characteristics?"
+    
+    if st.button("What is the average delivery time?", use_container_width=True):
+        prompt = "What is the average delivery time in days?"
+    
+    st.divider()
+    
+    # Chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
-    # Display previous messages
-    for message in st.session_state.messages:
-        with st.sidebar.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    question = st.chat_input("Ask me anything...")
-
-    if question:
-        # Display user message
-        with st.sidebar.chat_message("user"):
-            st.markdown(question)
+    
+    for msg in st.session_state.messages[-10:]:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+    
+    # Chat input
+    if prompt := st.chat_input("Ask me anything..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
         
-        # Generate answer
-        with st.sidebar.chat_message("assistant"):
+        with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                answer = ask_assistant(question, collection)
-            st.markdown(answer)
-
-        # Save conversation
-        st.session_state.messages.append({
-            "role": "user",
-            "content": question})
-
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": answer})
+                try:
+                    answer = ask_assistant(prompt, collection)
+                except Exception as e:
+                    answer = f"Error: {str(e)}"
+            st.write(answer)
+        
+        st.session_state.messages.append({"role": "assistant", "content": answer})
+        st.rerun()
 with tab2:
     st.header("Sentiment Analysis")
     fig1 = plot_nlp_dashboard(nlp_df, tfidf_vectorizer)
