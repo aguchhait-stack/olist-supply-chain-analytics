@@ -5,11 +5,19 @@
 
 ## 🛠️ Tech Stack
 
-- **Language:** Python
-- **Libraries:** Pandas, NumPy, Scikit-learn, NLTK, Transformers, Matplotlib, Seaborn, SciPy
-- **Database:** SQLite
-- **Models:** KMeans (clustering) · Logistic Regression (NLP) · XLM-RoBERTa (transformer comparison)
-- **NLP Pipeline:** TF-IDF + RSLPStemmer + Portuguese stopwords
+- **Language:** Python 3.10+
+- **Data:** Pandas, NumPy, SQLite
+- **ML:** Scikit-learn, KMeans, Logistic Regression
+- **NLP:** NLTK, TF-IDF, XLM-RoBERTa
+- **RAG:** Google Gemini 3.5 Flash · Sentence-Transformers · ChromaDB
+- **Visualization:** Matplotlib, Seaborn, Streamlit
+- **Deployment:** Streamlit Cloud
+
+---
+
+📊 Live Demo
+
+Try it now: https://olist-supply-chain-analytics.streamlit.app
 
 ---
 
