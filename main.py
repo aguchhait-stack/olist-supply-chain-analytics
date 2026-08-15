@@ -17,7 +17,7 @@ from src.utils.logger_utils import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__) 
 
-def run_pipeline():
+def run_pipeline(include_hf_comparison = True):
     """Execute the complete analytics pipeline."""
     print("=" * 60)
     print("Olist Supply Chain Analytics")
@@ -71,15 +71,16 @@ def run_pipeline():
     logger.info(f"Model accuracy: {pipeline.score(X_test, y_test):.2%}")
 
     # HF Comparison
-    _, match_rate = compare_with_huggingface_baseline(nlp_df, sample_size=500)
-    logger.info(f"HF match: {match_rate:.1%}")
+    if include_hf_comparison:
+        _, match_rate = compare_with_huggingface_baseline(nlp_df, sample_size=500)
+        logger.info(f"HF match: {match_rate:.1%}")
 
     print("=" * 60)
     print("RAG Assistant")
     print("=" * 60)
 
     # Businesss documents 
-    documents = build_knowledge_base(logistics_df,contingency,nlp_df)
+    documents = build_knowledge_base(logistics_df,contingency,nlp_df, rfm_df)
 
     # Embeddings
     document_vectors = create_embeddings(documents)

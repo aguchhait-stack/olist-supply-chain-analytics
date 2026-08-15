@@ -17,7 +17,7 @@ st.title("📊 Olist Supply Chain Analytics")
 # Load all data (cached)
 @st.cache_resource
 def load_pipeline_data():
-    return run_pipeline() 
+    return run_pipeline(include_hf_comparison=False) 
 logistics_df,contingency,chi2,p,dof,rfm_df,nlp_df,pipeline,kmeans,collection,X_sparse,vectorizer = load_pipeline_data()
 
 # Pages
@@ -55,14 +55,36 @@ with tab1:
 
 with st.sidebar:
     st.subheader("🤖 Ask the Olist Assistant")
-    question = st.sidebar.chat_input("Ask me anything...")
-    if question:
-        with st.sidebar.chat_message("user"):
-            st.write(question)
-        answer = ask_assistant(question, collection)
-        with st.sidebar.chat_message("assistant"):
-            st.write(answer)
 
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display previous messages
+    for message in st.session_state.messages:
+        with st.sidebar.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    question = st.chat_input("Ask me anything...")
+
+    if question:
+        # Display user message
+        with st.sidebar.chat_message("user"):
+            st.markdown(question)
+        
+        # Generate answer
+        with st.sidebar.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                answer = ask_assistant(question, collection)
+            st.markdown(answer)
+
+        # Save conversation
+        st.session_state.messages.append({
+            "role": "user",
+            "content": question})
+
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer})
 with tab2:
     st.header("Sentiment Analysis")
     fig1 = plot_nlp_dashboard(nlp_df, tfidf_vectorizer)
@@ -83,17 +105,6 @@ with tab4:
     st.header('RFM Segmentation')
     fig1 = plot_rfm_segments(rfm_df)
     st.pyplot(fig1)
-
-
-    
-
-
-
-
-      
-
-
-
 
 
 
