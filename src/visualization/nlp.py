@@ -129,7 +129,7 @@ def plot_predictive_word(model, vectorizer):
     plt.suptitle('Top 10 Predictive Words by Sentiment Class', fontsize=13, fontweight='bold')
     plt.tight_layout()
     plt.savefig('outputs/predictive_words_barchart.png')
-    return fig1, fig2
+    return fig2
 
 
 def plot_sentiment_correlation(nlp_df: pd.DataFrame):

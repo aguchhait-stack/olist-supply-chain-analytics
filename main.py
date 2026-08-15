@@ -17,7 +17,7 @@ from src.utils.logger_utils import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__) 
 
-def main():
+def run_pipeline():
     """Execute the complete analytics pipeline."""
     print("=" * 60)
     print("Olist Supply Chain Analytics")
@@ -49,7 +49,7 @@ def main():
     print("=" * 60)
     print("SLA Analysis")
     print("=" * 60)
-    contingency, _, _, _,_ = analyze_sla_by_state(logistics_df)
+    contingency, chi2, p, dof, expected = analyze_sla_by_state(logistics_df)
 
     # RFM Segmentation
     print("=" * 60)
@@ -61,7 +61,7 @@ def main():
     print("=" * 60)
     print("Sentiment Analysis")
     print("=" * 60)
-    nlp_df, _, X_sparse, _ = build_sentiment_analysis(logistics_df)
+    nlp_df, _, X_sparse, vectorizer = build_sentiment_analysis(logistics_df)
 
     # Sentiment Model
     print("=" * 60)
@@ -96,6 +96,10 @@ def main():
     print("Pipeline completed successfully")
     print("=" * 60)
 
+    return (logistics_df,contingency,chi2,p,dof,rfm_df,nlp_df,pipeline,kmeans,collection,X_sparse,vectorizer)
+
+def main():
+    run_pipeline()
 
 if __name__ == "__main__":
     main()
