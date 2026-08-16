@@ -21,7 +21,7 @@ st.title("📊 Olist Supply Chain Analytics")
 # Load all data (cached)
 @st.cache_resource
 def load_pipeline_data():
-    return run_pipeline(include_hf_comparison=False, fast_load=True) 
+    return run_pipeline(include_hf_comparison=False) 
 (
     logistics_df,
     contingency,
@@ -34,11 +34,10 @@ def load_pipeline_data():
     kmeans,
     collection,
     X_sparse,
-    vectorizer, 
+    vectorizer,
     y_pred, 
     y_test,
-    shap_values
-)  = load_pipeline_data()
+    shap_values) = load_pipeline_data()
 
 # Pages
 tab1, tab2, tab3, tab4 = st.tabs(["🏠 Overview", "💬 Sentiment", "🚚 Logistics", "👥 Customer Segments"])
