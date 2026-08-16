@@ -21,7 +21,7 @@ st.title("📊 Olist Supply Chain Analytics")
 # Load all data (cached)
 @st.cache_resource
 def load_pipeline_data():
-    return run_pipeline(include_hf_comparison=False) 
+    return run_pipeline(include_hf_comparison=False, fast_load=True) 
 (
     logistics_df,
     contingency,
