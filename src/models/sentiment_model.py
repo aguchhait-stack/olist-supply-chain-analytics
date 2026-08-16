@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from scipy.sparse import csr_matrix, hstack
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 RANDOM_STATE = 42
 NUMERIC_FEATURE_COLS = ["is_late", "review_length", "delivery_days"]
 SCALED_FEATURE_COLS = ["review_length", "delivery_days"]
+SHAP_SAMPLES = 100
 
 def _build_feature_matrix(nlp_df: pd.DataFrame, X_sparse: csr_matrix) -> tuple:
     """
@@ -55,7 +57,7 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
 
     features, target = _build_feature_matrix(nlp_df,X_sparse)
 
-    # train test split, stratify for biasness proof
+    # Stratified  split to preserve class distribution
     X_train, X_test, y_train, y_test = train_test_split(features,target,test_size=0.2,random_state= RANDOM_STATE,shuffle=True, stratify=target)
 
     # Extracting columns index for scaled features
@@ -83,8 +85,16 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
 
     # SHAP Explainer
     X_test_transformed = pipeline_logit.named_steps["preprocessor"].transform(X_test)
-    explainer = shap.LinearExplainer(pipeline_logit.named_steps["logistic"], X_test_transformed)
-    shap_values = explainer(X_test_transformed)
+
+    #SHAP Sample for steamlit limitage
+    sample_size = min(SHAP_SAMPLES, X_test_transformed.shape[0])
+    rng = np.random.RandomState(RANDOM_STATE)
+    indices = rng.choice(X_test_transformed.shape[0],size=sample_size,replace=False)
+    X_test_sample = X_test_transformed[indices]
+
+    # Explainer 
+    explainer = shap.LinearExplainer(pipeline_logit.named_steps["logistic"],X_test_sample)
+    shap_values = explainer(X_test_sample)
     logger.info(f"✅ Model trained, Test Accuracy: {accuracy:.4f}")
     logger.info(f"\n{classification_report(y_test, y_pred)}")
     logger.info(f"✅ SHAP values shape: {shap_values.shape}")
