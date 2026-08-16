@@ -1,10 +1,17 @@
 import pandas as pd
 import logging
+from src.models.sentiment_model import (NUMERIC_FEATURE_COLS, SCALED_FEATURE_COLS)
+
 
 logger = logging.getLogger(__name__)
 
 
-def build_knowledge_base(logistics_df: pd.DataFrame,contingency: pd.DataFrame,nlp_df: pd.DataFrame,rfm_df: pd.DataFrame) -> list[str]:
+def build_knowledge_base(logistics_df: pd.DataFrame,
+                         contingency: pd.DataFrame,
+                         nlp_df: pd.DataFrame,
+                         rfm_df: pd.DataFrame,
+                         shap_values,
+                         vectorizer) -> list[str]:
 
     insights = []
 
@@ -93,6 +100,21 @@ def build_knowledge_base(logistics_df: pd.DataFrame,contingency: pd.DataFrame,nl
     {strongest_driver} (Spearman = {strongest_value:.2f}) is the strongest driver of late deliveries,
     indicating regional carrier optimization should be the top logistics priority.
     """)
+    # Model Explainability
+    feature_names = SCALED_FEATURE_COLS + \
+                        [col for col in NUMERIC_FEATURE_COLS if col not in SCALED_FEATURE_COLS] + \
+                        vectorizer.get_feature_names_out().tolist()
+    shap_importance = abs(shap_values.values).mean(axis=(0, 2))
+    top_indices = shap_importance.argsort()[-15:][::-1]
+
+    insights.append("Model Explainability - Global SHAP Feature Importance:")
+    for index in top_indices:
+        insights.append(f"  {feature_names[index]}: {shap_importance[index]:.4f}")
+    insights.append(
+            "SHAP values show the overall importance of features "
+            "across sentiment model predictions. The model uses both "
+            "review text and operational features such as review length, "
+            "late delivery, and delivery time.")
 
     logger.info("Knowledge base created: %d documents", len(insights))
 

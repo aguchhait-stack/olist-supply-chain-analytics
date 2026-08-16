@@ -6,6 +6,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
+import shap
 import logging
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
     -------
     tuple
         Trained model pipeline, test feature matrix, predicted labels,
-        and actual test labels.
+        actual test labels and SHAP values for model explainability.
     """
 
     features, target = _build_feature_matrix(nlp_df,X_sparse)
@@ -73,13 +74,22 @@ def train_sentiment_model(nlp_df: pd.DataFrame, X_sparse: csr_matrix, max_iter =
                                                         solver = 'saga',
                                                         C = regularization # stronger regularization for rare words
                                                         ))])
+    # Fit and predict the model
     pipeline_logit.fit(X_train,y_train)
     y_pred = pipeline_logit.predict(X_test)
+
+    # Evaluation and explain
     accuracy = accuracy_score(y_test, y_pred)
+
+    # SHAP Explainer
+    X_test_transformed = pipeline_logit.named_steps["preprocessor"].transform(X_test)
+    explainer = shap.LinearExplainer(pipeline_logit.named_steps["logistic"], X_test_transformed)
+    shap_values = explainer(X_test_transformed)
     logger.info(f"✅ Model trained, Test Accuracy: {accuracy:.4f}")
     logger.info(f"\n{classification_report(y_test, y_pred)}")
+    logger.info(f"✅ SHAP values shape: {shap_values.shape}")
 
-    return pipeline_logit, X_test, y_pred, y_test
+    return pipeline_logit, X_test, y_pred, y_test, shap_values
 
 
 

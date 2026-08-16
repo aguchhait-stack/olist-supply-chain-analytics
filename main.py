@@ -67,7 +67,7 @@ def run_pipeline(include_hf_comparison = True):
     print("=" * 60)
     print("Sentiment Model")
     print("=" * 60)
-    pipeline, X_test, _, y_test = train_sentiment_model(nlp_df, X_sparse)
+    pipeline, X_test, y_pred, y_test, shap_values = train_sentiment_model(nlp_df, X_sparse)
     logger.info(f"Model accuracy: {pipeline.score(X_test, y_test):.2%}")
 
     # HF Comparison
@@ -80,7 +80,7 @@ def run_pipeline(include_hf_comparison = True):
     print("=" * 60)
 
     # Businesss documents 
-    documents = build_knowledge_base(logistics_df,contingency,nlp_df, rfm_df)
+    documents = build_knowledge_base(logistics_df,contingency,nlp_df, rfm_df, shap_values, vectorizer)
 
     # Embeddings
     document_vectors = create_embeddings(documents)
@@ -97,7 +97,22 @@ def run_pipeline(include_hf_comparison = True):
     print("Pipeline completed successfully")
     print("=" * 60)
 
-    return (logistics_df,contingency,chi2,p,dof,rfm_df,nlp_df,pipeline,kmeans,collection,X_sparse,vectorizer)
+    return (
+            logistics_df,
+            contingency,
+            chi2,
+            p,
+            dof,
+            rfm_df,
+            nlp_df,
+            pipeline,
+            kmeans,
+            collection,
+            X_sparse,
+            vectorizer,
+            y_pred, 
+            y_test,
+            shap_values)
 
 def main():
     run_pipeline()

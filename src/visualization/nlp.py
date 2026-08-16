@@ -1,8 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from src.analysis.nlp_analysis import tfidf_vectorizer
-from src.models.sentiment_model import (NUMERIC_FEATURE_COLS, SCALED_FEATURE_COLS)
+from sklearn.metrics import ConfusionMatrixDisplay
 import seaborn as sns
+from src.models.sentiment_model import (NUMERIC_FEATURE_COLS, SCALED_FEATURE_COLS)
 import logging
 logger = logging.getLogger(__name__) 
 
@@ -94,42 +94,20 @@ def plot_predictive_word(model, vectorizer):
 
     coef_df = pd.DataFrame(coef, index=index, columns=feature_names).T
 
-    fig1 = None
-    # Word Clouds
-    try:
-        from wordcloud import WordCloud
-        
-        fig1, axis = plt.subplots(1, 3, figsize=(18, 6))
-        colormap = {'negative': 'Reds', 'neutral': 'Blues', 'positive': 'Greens'}
-        
-        for i, (sentiment, color) in enumerate(colormap.items()):
-            wc = WordCloud(width=600, height=400, background_color='white', colormap=color)
-            top_words = coef_df[sentiment][coef_df[sentiment] > 0].nlargest(50).to_dict()
-            axis[i].imshow(wc.generate_from_frequencies(top_words), interpolation='bilinear')
-            axis[i].set_title(f'{sentiment.capitalize()} Reviews', fontweight='bold')
-            axis[i].axis('off')
-
-        plt.suptitle('Most Predictive Words by Sentiment Class', fontsize=13, fontweight='bold')
-        plt.tight_layout()
-        plt.savefig('outputs/predictive_words_wordcloud_colored.png')
-
-    except Exception as e:
-        logger.warning("WordCloud module missing or failed. Try running: pip install wordcloud")
-
     # Bar Charts
-    fig2, axis = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axis = plt.subplots(1, 3, figsize=(21, 8))
     colormap = {'negative': 'red', 'neutral': 'blue', 'positive': 'green'}
     
     for i, (sentiment, color) in enumerate(colormap.items()):
         top_words = coef_df[sentiment][coef_df[sentiment] > 0].nlargest(10)
         axis[i].barh(top_words.index, top_words.values, color=color)
         axis[i].grid(True, alpha=0.3, axis='x')
-        axis[i].set_title(f'{sentiment.capitalize()} Reviews', fontweight='bold')
+        axis[i].set_title(f'{sentiment.capitalize()} Reviews',fontsize=11,fontweight='bold')
 
     plt.suptitle('Top 10 Predictive Words by Sentiment Class', fontsize=13, fontweight='bold')
     plt.tight_layout()
     plt.savefig('outputs/predictive_words_barchart.png')
-    return fig2
+    return fig
 
 
 def plot_sentiment_correlation(nlp_df: pd.DataFrame):
@@ -152,4 +130,38 @@ def plot_sentiment_correlation(nlp_df: pd.DataFrame):
     
     plt.tight_layout()
     plt.savefig('outputs/spearman_correlation_drivers_vs_sentiment.png')
+    return fig
+
+def plot_shap_summary(shap_values, vectorizer):
+    """
+    Plot SHAP feature importance for sentiment prediction.
+    """
+    feature_names = SCALED_FEATURE_COLS + \
+                        [col for col in NUMERIC_FEATURE_COLS if col not in SCALED_FEATURE_COLS] + \
+                        vectorizer.get_feature_names_out().tolist()
+
+    shap_importance = abs(shap_values.values).mean(axis=(0, 2))
+    top_indices = shap_importance.argsort()[-15:]
+    top_features = [feature_names[i] for i in top_indices]
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.barh(top_features,shap_importance[top_indices], color='teal')
+    ax.grid(True, alpha=0.3, axis='x')
+    
+    ax.set_title("Global SHAP Feature Importance", fontsize=11, fontweight='bold')
+    ax.set_xlabel("Mean Absolute SHAP Value")
+    plt.tight_layout()
+    plt.savefig('outputs/shap_feature_importance_top15.png')
+    return fig
+
+
+def plot_confusion_matrix(y_test, y_pred):
+    """
+    Plot the confusion matrix for sentiment classification.
+    """
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    ConfusionMatrixDisplay.from_predictions(y_test,y_pred,ax=ax,cmap="Blues")
+    ax.set_title("Sentiment Classification Confusion Matrix",fontsize=13,fontweight="bold")
+    plt.tight_layout()
+    plt.savefig("outputs/sentiment_confusion_matrix.png")
     return fig

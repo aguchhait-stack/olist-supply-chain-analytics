@@ -46,3 +46,6 @@ def ask_assistant(question: str, collection, top_k: int = 2) -> str:
         return response.text.strip()
     except Exception as e:
         logger.error(f"RAG pipeline failed: {e}")
+        if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+            return "Gemini API quota exceeded. Please try again later."
+        return "Sorry, I am having internal problems."

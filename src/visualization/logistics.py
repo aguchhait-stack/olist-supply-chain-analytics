@@ -53,7 +53,7 @@ def plot_logistics_bottlenecks(logistics_df: pd.DataFrame):
     """
     Plot key logistics bottleneck indicators.
     """
-    fig, axis = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axis = plt.subplots(1, 2, figsize=(18, 7))
     
     # transit days vs vendor days
     logistics_df[['carrier_transit_days', 'vendor_handling_days']].mean().plot(
