@@ -62,7 +62,7 @@ with tab1:
     # KPI 
     total_orders = period_logistics_df["order_id"].nunique()
     total_revenue = period_logistics_df["total_price"].sum()
-    avg_review_score = period_logistics_df["mean_review_score"].mean()
+    avg_review_score = period_nlp_df["mean_review_score"].mean()
     late_delivery_rate = period_logistics_df["is_late"].mean()
 
     col1, col2, col3, col4 = st.columns(4)
