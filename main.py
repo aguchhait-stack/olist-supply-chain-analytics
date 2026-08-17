@@ -89,7 +89,7 @@ def run_pipeline(include_hf_comparison = True):
     collection = create_vector_store(documents,document_vectors)
 
     # Ask Assistant
-    question = "What are the SLA breach rates by state?"
+    question = "Which state has the highest SLA breach rate?"
     answer = ask_assistant(question,collection)
     logger.info("Assistant response: %s", answer)
 

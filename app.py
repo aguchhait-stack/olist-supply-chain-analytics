@@ -133,10 +133,11 @@ with st.sidebar:
     # Sample Questions
     st.caption("Try asking:")
     sample_questions = ["Which state has the highest SLA breach rate?",
-    "Which product categories generate the most revenue?",
-    "What are the most important features influencing sentiment predictions?",
+    "Which product categories have the highest sales volume?",
+    "What are the most important features influencing sentiment predictions according to SHAP?",
     "What does the sentiment analysis tell us about late deliveries?",
     "Which customer segment has the highest value, and how should it be targeted?"]
+    
 
     selected_prompt = None
     for sample_question in sample_questions:

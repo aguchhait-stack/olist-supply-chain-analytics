@@ -27,7 +27,7 @@ The project combines **business analytics, logistics analysis, customer segmenta
 - **Machine Learning:** Scikit-learn, K-Means, Logistic Regression
 - **NLP:** NLTK, TF-IDF, XLM-RoBERTa
 - **Explainability:** SHAP
-- **RAG:** Sentence-Transformers, ChromaDB, Google Gemini
+- **RAG:** Sentence-Transformers (embeddings), ChromaDB (vector store), Google Gemini (LLM)
 - **Visualization:** Matplotlib, Seaborn, Streamlit
 - **Engineering:** Git/GitHub, Pytest, Logging
 - **Deployment:** Streamlit Cloud
@@ -93,7 +93,10 @@ SHAP analysis shows that sentiment predictions depend on both **review text and 
 
 Features such as `review_length` and `delivery_days` can have high global SHAP importance even when they are not among the strongest class-specific predictive words.
 
+SHAP explanations are generated using a **100-row sample of the test set** to reduce computational and memory overhead while preserving representative model explanations.
+
 This demonstrates the value of combining **textual and operational features** when modelling customer sentiment.
+
 
 ### 👥 Customer Segmentation
 
@@ -110,6 +113,15 @@ K-Means identified four customer groups:
 - **November is the strongest trading period**, with revenue and order volume peaking around Black Friday.
 - **A small number of product categories drive a large share of revenue**, with computers and accessories among the leading categories.
 - **Revenue and order volume show clear seasonal patterns**, providing useful insight for demand and capacity planning.
+
+### 🔧 Data Engineering &
+
+- The analytical dataset is maintained at **one row per order**.
+- One-to-many relationships in `order_items`, `order_payments`, and `order_reviews` were validated to identify potential fanout before constructing the order-level analytical dataset.
+- Payment information is added **after order-level deduplication** to avoid fanout from the one-to-many `order_payments` table:
+  - `sum` : `payment_value` → `total_payment_value`
+  - `mode` : `payment_type`
+- Geolocation is aggregated by ZIP prefix before being merged with customer and seller locations.
 
 ---
 
@@ -197,8 +209,8 @@ The knowledge base contains insights from:
 Example questions:
 
 - Which state has the highest SLA breach rate?
-- Which product categories generate the most revenue?
-- What are the most important features influencing sentiment predictions?
+- Which product categories have the highest sales volume?
+- What are the most important features influencing sentiment predictions according to SHAP?
 - What does the sentiment analysis tell us about late deliveries?
 - Which customer segment has the highest value, and how should it be targeted?
 

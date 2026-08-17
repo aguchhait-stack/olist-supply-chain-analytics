@@ -1,5 +1,6 @@
 import pytest
 from src.data.ingest import ingestion
+from src.data.logistics_data import build_logistics_dataframe
 import pandas as pd
 
 
@@ -17,7 +18,9 @@ def test_tables(engine):
     assert len(tables) == 9
     assert set(expected_tables) == set(tables['name'])
 
-def test_duplicate_order_id(engine):
-    distinct_count = pd.read_sql("SELECT COUNT(DISTINCT order_id) FROM orders",engine).iloc[0,0]
-    total_count = pd.read_sql("SELECT COUNT(*) FROM orders",engine).iloc[0,0]
-    assert distinct_count == total_count
+def test_logistics_df(engine):
+    logistics_df = build_logistics_dataframe(engine)
+    order_counts = logistics_df.groupby("order_id").size()
+
+    # Duplicate orders
+    assert (order_counts > 1).sum() == 0 

@@ -27,9 +27,6 @@ def build_master_dataframe(engine) -> pd.DataFrame:
     -- sellers
     s.seller_state, s.seller_city, s.seller_zip_code_prefix,
 
-    -- order_payments
-    op.payment_type, op.payment_value,
-
     -- order_reviews
     r.review_score, r.review_comment_message
 
@@ -39,7 +36,6 @@ def build_master_dataframe(engine) -> pd.DataFrame:
     LEFT JOIN sellers s USING(seller_id)
     LEFT JOIN products p USING(product_id)
     LEFT JOIN product_category_name_translation pt USING(product_category_name) 
-    LEFT JOIN order_payments op USING(order_id)
     LEFT JOIN order_reviews r  USING(order_id)
 
     """
@@ -63,7 +59,6 @@ def _aggregate_orders(master_df: pd.DataFrame) -> pd.DataFrame:
 
     "price":                  ("total_price","sum"),
     "freight_value":          ("total_freight_value","sum"),
-    "payment_value":          ("total_payment_value","sum"),
     "review_score" :          ("mean_review_score","mean"),
 
     # Aggregation with first occurance for review comment with null value check
@@ -75,15 +70,14 @@ def _aggregate_orders(master_df: pd.DataFrame) -> pd.DataFrame:
     # Aggregation with most occurance for string columns
     "product_category":       ("product_category", lambda x: x[x.notna()].mode()[0] if x.notna().any() else np.nan),
     "seller_state":           ("seller_state",lambda x: x[x.notna()].mode()[0] if x.notna().any() else np.nan),
-    "seller_city":            ("seller_city",lambda x: x[x.notna()].mode()[0] if x.notna().any() else np.nan),
-    "payment_type":           ("payment_type",lambda x: x[x.notna()].mode()[0] if x.notna().any() else np.nan)
+    "seller_city":            ("seller_city",lambda x: x[x.notna()].mode()[0] if x.notna().any() else np.nan)
     }
     # Aggregation without collapsing any rows uisng the logic in aggregation_map
     for col, (new_col,func) in aggregation_map.items():
         logistics_df[new_col] = logistics_df.groupby('order_id')[col].transform(func)
 
     # droping non-aggregation columns
-    col_to_drop = ['price', 'freight_value', 'payment_value', 'review_score', 'order_item_id']
+    col_to_drop = ['price', 'freight_value', 'review_score', 'order_item_id']
     logistics_df = logistics_df.drop(columns = col_to_drop)
 
     # Fitering null dates
@@ -148,6 +142,24 @@ def _add_haversine_distance(logistics_df: pd.DataFrame) -> pd.DataFrame:
     logistics_df['distance_km'] = logistics_df['distance_km'].fillna(logistics_df['distance_km'].median())
     return logistics_df
 
+def _add_payments(logistics_df: pd.DataFrame, engine=engine) -> pd.DataFrame: 
+
+    # Load payment transactions
+    PAYMENT_QUERY = """
+    SELECT order_id, payment_type, payment_value
+    FROM order_payments
+    """
+    payments = pd.read_sql(PAYMENT_QUERY,engine)
+
+    # Aggregate payment information to one row per order
+    payment_summary = payments.groupby("order_id").agg(
+        total_payment_value=("payment_value", "sum"),
+        payment_type=("payment_type",lambda x: (x.mode().iloc[0] if not x.mode().empty else np.nan))).reset_index()
+
+    # Merge with logistics dataframe
+    logistics_df = logistics_df.merge(payment_summary, on="order_id",how="left")
+    return logistics_df
+
 def build_logistics_dataframe(engine=engine, master_df=None) -> pd.DataFrame:
     """
     Build the canonical logistics dataset.
@@ -161,6 +173,7 @@ def build_logistics_dataframe(engine=engine, master_df=None) -> pd.DataFrame:
     5. Create order-level features.
     6. Enrich with geolocation.
     7. Calculate customer–seller distance.
+    8. Add order-level payment information.
 
     Returns
     -------
@@ -177,5 +190,6 @@ def build_logistics_dataframe(engine=engine, master_df=None) -> pd.DataFrame:
     logistics_df = _add_order_features(logistics_df)
     logistics_df = _add_geolocation(logistics_df, engine)
     logistics_df = _add_haversine_distance(logistics_df)
+    logistics_df = _add_payments(logistics_df)
     logger.info(f"✅ Logistics dataframe: {logistics_df.shape[0]:,} rows, {logistics_df.shape[1]} columns")
     return logistics_df
